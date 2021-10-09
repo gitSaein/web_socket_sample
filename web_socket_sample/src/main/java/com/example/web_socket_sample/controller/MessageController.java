@@ -21,30 +21,31 @@ import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @Slf4j
-public class GreetingController {
+public class MessageController {
 
     private static final Set<String> SESSION_IDS = new HashSet<>();
 //    private final SimpMessagingTemplate messagingTemplate;
 	
 	@MessageMapping("/chat/{roomSeq}")
-	@SendTo("/chat/1")
+	@SendTo("/topic/chat/{roomSeq}")
 	public Message greeting(@DestinationVariable("roomSeq") int roomSeq, @Payload Message message) throws InterruptedException {
 		log.info(String.format("[%d] %s ", roomSeq, message.getMessage()));
 		return message;
 		
 	}
-	  @EventListener(SessionConnectEvent.class)
-	    public void onConnect(SessionConnectEvent event) {
-	        String sessionId = event.getMessage().getHeaders().get("simpSessionId").toString();
-	        SESSION_IDS.add(sessionId);
-	        log.info("[connect] connections : {}", SESSION_IDS.size());
-	    }
+	
+	@EventListener(SessionConnectEvent.class)
+    public void onConnect(SessionConnectEvent event) {
+        String sessionId = event.getMessage().getHeaders().get("simpSessionId").toString();
+        SESSION_IDS.add(sessionId);
+        log.info("[connect] connections : {}", SESSION_IDS.size());
+    }
 
-	    @EventListener(SessionDisconnectEvent.class)
-	    public void onDisconnect(SessionDisconnectEvent event) {
-	        String sessionId = event.getSessionId();
-	        SESSION_IDS.remove(sessionId);
-	        log.info("[disconnect] connections : {}", SESSION_IDS.size());
-	    }
+    @EventListener(SessionDisconnectEvent.class)
+    public void onDisconnect(SessionDisconnectEvent event) {
+        String sessionId = event.getSessionId();
+        SESSION_IDS.remove(sessionId);
+        log.info("[disconnect] connections : {}", SESSION_IDS.size());
+    }
 
 }
