@@ -18,7 +18,7 @@ function connect() {
     stompClient.connect({}, function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/topic/chat/1', function (message) {
+        stompClient.subscribe('/exchange/message.topic/room.1', function (message) {
 		
 		console.log("# start subscribe")
             showMessages(JSON.parse(message.body).message);
@@ -34,8 +34,14 @@ function disconnect() {
     console.log("Disconnected");
 }
 
-function sendName() {
-    stompClient.send("/app/chat/1", {}, JSON.stringify({'message': $("#message").val()}));
+function sendMessage() {
+	const message = $("#message").val();
+    stompClient.send("/app/chat/send/message", {}, JSON.stringify({
+		rommIdx:1,
+		messageType: 'C',
+		senderIdx:1,
+		message: message,
+	}));
 }
 
 function showMessages(message) {
@@ -48,6 +54,6 @@ $(function () {
     });
     $( "#connect" ).click(function() { connect(); });
     $( "#disconnect" ).click(function() { disconnect(); });
-    $( "#send" ).click(function() { sendName(); });
+    $( "#send" ).click(function() { sendMessage(); });
 });
 
