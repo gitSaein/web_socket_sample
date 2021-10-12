@@ -1,2 +1,3 @@
-package com.example.web_socket_sample.config;public class RabbitMqConfig {
+package com.example.web_socket_sample.config;
+public class RabbitMqConfig {
 }

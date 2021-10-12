@@ -3,6 +3,7 @@ package com.example.web_socket_sample.controller;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.example.web_socket_sample.dto.ChatDto;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -12,26 +13,24 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-import com.example.web_socket_sample.model.Message;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @Slf4j
-public class GreetingController {
+public class ChatController {
 
     private static final Set<String> SESSION_IDS = new HashSet<>();
 //    private final SimpMessagingTemplate messagingTemplate;
 	
 	@MessageMapping("/chat/{roomSeq}")
 	@SendTo("/chat/1")
-	public Message greeting(@DestinationVariable("roomSeq") int roomSeq, @Payload Message message) throws InterruptedException {
+	public ChatDto greeting(@DestinationVariable("roomSeq") int roomSeq, @Payload ChatDto message) throws InterruptedException {
 		log.info(String.format("[%d] %s ", roomSeq, message.getMessage()));
 		return message;
 	}
 
 	@MessageMapping("chat.enter.{roomId}")
-	public void enter(Message message, @DestinationVariable("roomId") int roomId){
+	public void enter(ChatDto message, @DestinationVariable("roomId") int roomId){
 
 	}
 

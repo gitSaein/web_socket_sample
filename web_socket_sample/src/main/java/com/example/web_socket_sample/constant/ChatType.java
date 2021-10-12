@@ -5,8 +5,8 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum RabbitMq {
-    CREATE("create.room.%d"), MESSAGE("message.%d"), LEAVE("leave.room.%d");
+public enum ChatType {
+    CREATE('C'), MESSAGE('M'), LEAVE('L');
 
-    private final String key;
+    private final char code;
 }
