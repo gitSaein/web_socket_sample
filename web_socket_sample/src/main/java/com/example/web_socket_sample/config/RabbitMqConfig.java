@@ -13,23 +13,9 @@ import org.springframework.context.annotation.Configuration;
 
 import com.example.web_socket_sample.constant.RabbitMqConstants;
 
+@EnableRabbit
 @Configuration
 public class RabbitMqConfig {
-	
-	@Bean
-	public Queue queue() {
-		return new Queue(RabbitMqConstants.CHAT_QUEUE_NM, true);
-	}
-	
-	@Bean
-	public TopicExchange exchange() {
-		return new TopicExchange(RabbitMqConstants.CHAT_EXCHANGE_NM);
-	}
-	
-	@Bean
-	public Binding binding(Queue queue, TopicExchange topicExchange) {
-		return BindingBuilder.bind(queue).to(topicExchange).with(RabbitMqConstants.ROUTING_KEY);
-	}
 	
 	@Bean
 	public Jackson2JsonMessageConverter produceJackson2MessageConverter() {
@@ -40,6 +26,8 @@ public class RabbitMqConfig {
 	public RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory) {
 		final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
 		rabbitTemplate.setMessageConverter(produceJackson2MessageConverter());
+		rabbitTemplate.setRoutingKey(RabbitMqConstants.CHAT_QUEUE_NM);
 		return rabbitTemplate;
 	}
+	
 }

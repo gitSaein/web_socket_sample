@@ -8,13 +8,15 @@ import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import com.example.web_socket_sample.config.RabbitMqListeners;
 import com.example.web_socket_sample.constant.RabbitMqConstants;
 import com.example.web_socket_sample.dto.ChatMessageDto;
-import com.example.web_socket_sample.service.ProducerService;
+import com.example.web_socket_sample.service.ChatMessageService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,32 +26,25 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ChatController {
 	
-	private final ProducerService produceService;
+	private final ChatMessageService chatMessageService;
+	private final RabbitMqListeners rabbitmqListeners;
 
     private static final Set<String> SESSION_IDS = new HashSet<>();
 //    private final SimpMessagingTemplate messagingTemplate;
 	
-	@MessageMapping("/chat/send/message")
-	public ChatMessageDto greeting(@Payload ChatMessageDto message) throws InterruptedException {
-		log.info(String.format("[%d] %s ", message.getRommIdx(), message.getMessage()));
-		produceService.sendChantMessage(message);
+	@MessageMapping("/chat/send/message/{roomId}")
+	@SendTo("/exchange/message.topic/message.room.{roomId}")
+	public ChatMessageDto greeting(@Payload ChatMessageDto message, @DestinationVariable("roomId") int roomId) throws InterruptedException {
+		log.info(String.format("[%d] %s ", message.getRoomIdx(), message.getMessage()));
+		chatMessageService.sendChantMessage(message);
 		return message;
 	}
+	
 
 	@MessageMapping("chat.enter.{roomId}")
 	public void enter(ChatMessageDto message, @DestinationVariable("roomId") int roomId){
 
 	}
-
-	
-//	@RabbitListener(bindings = @QueueBinding(
-//			value = @Queue,
-//			exchange = @Exchange(value = RabbitMqConstants.CHAT_EXCHANGE_NM),
-//			key = ""
-//			))
-//	 public void processQueue2(ChatMessageDto message) {
-//		log.info(">> " + message);
-//	}
 
   	@EventListener(SessionConnectEvent.class)
 	public void onConnect(SessionConnectEvent event) {

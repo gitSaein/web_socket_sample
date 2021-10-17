@@ -21,7 +21,7 @@ import lombok.Setter;
 @RequiredArgsConstructor
 public class ChatMessageDto {
     @NonNull
-	private int rommIdx;
+	private int roomIdx;
     @NonNull
     private int senderIdx;
     @NonNull
